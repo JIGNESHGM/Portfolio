@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the application code to the container
 COPY . /app
 
+# Grant executable permissions to the Maven wrapper
+RUN chmod +x ./mvnw
+
 # Download dependencies to cache them
 RUN ./mvnw dependency:go-offline
 
