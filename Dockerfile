@@ -8,8 +8,14 @@ RUN apt-get update && apt-get install -y \
     tar \
     unzip \
     maven && \
-    wget -qO- https://download.java.net/openjdk/jdk23/ri/openjdk-23_linux-x64_bin.tar.gz | tar -xz -C /usr/lib/jvm && \
-    mv /usr/lib/jvm/jdk-23 /usr/lib/jvm/java-23-openjdk && \
+    wget -O /tmp/openjdk-23.tar.gz https://download.java.net/openjdk/jdk23/ri/openjdk-23_linux-x64_bin.tar.gz && \
+    if [ "$(sha256sum /tmp/openjdk-23.tar.gz | awk '{print $1}')" = "<expected-sha256-hash>" ]; then \
+        tar -xz -C /usr/lib/jvm -f /tmp/openjdk-23.tar.gz && \
+        mv /usr/lib/jvm/jdk-23 /usr/lib/jvm/java-23-openjdk; \
+    else \
+        echo "Checksum validation failed!" && exit 1; \
+    fi && \
+    rm -f /tmp/openjdk-23.tar.gz && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the JAVA_HOME environment variable
@@ -29,4 +35,4 @@ RUN mvn clean package
 EXPOSE 8080
 
 # Run the application
-CMD ["mvn", "spring-boot:run"]
+CMD ["java", "-jar", "target/your-application-name.jar"]
