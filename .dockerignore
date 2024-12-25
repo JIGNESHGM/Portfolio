@@ -1,0 +1,9 @@
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+.git
+.idea
+node_modules
+target
