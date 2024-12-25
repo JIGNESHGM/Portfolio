@@ -1,38 +1,17 @@
-# Use an official Ubuntu image as the base image
-FROM ubuntu:20.04
+# Use a stable base image with OpenJDK pre-installed
+FROM eclipse-temurin:17-jdk-focal
 
-# Install dependencies, OpenJDK 23, and Maven
-RUN apt-get update && apt-get install -y \
-    wget \
-    curl \
-    tar \
-    unzip \
-    maven && \
-    wget -O /tmp/openjdk-23.tar.gz https://download.java.net/openjdk/jdk23/ri/openjdk-23_linux-x64_bin.tar.gz && \
-    if [ "$(sha256sum /tmp/openjdk-23.tar.gz | awk '{print $1}')" = "<expected-sha256-hash>" ]; then \
-        tar -xz -C /usr/lib/jvm -f /tmp/openjdk-23.tar.gz && \
-        mv /usr/lib/jvm/jdk-23 /usr/lib/jvm/java-23-openjdk; \
-    else \
-        echo "Checksum validation failed!" && exit 1; \
-    fi && \
-    rm -f /tmp/openjdk-23.tar.gz && \
-    rm -rf /var/lib/apt/lists/*
+# Set the working directory
+WORKDIR /app
 
-# Set the JAVA_HOME environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-23-openjdk
-ENV PATH=$JAVA_HOME/bin:$PATH
+# Copy the application code to the container
+COPY . /app
 
-# Set the working directory in the container
-WORKDIR /src
+# Download dependencies to cache them
+RUN ./mvnw dependency:go-offline
 
-# Copy the current directory contents into the container at /src
-COPY . /src
-
-# Build the application using Maven
-RUN mvn clean package
-
-# Expose port 8080 for the application
+# Expose the application port
 EXPOSE 8080
 
-# Run the application
-CMD ["java", "-jar", "target/your-application-name.jar"]
+# Run the Spring Boot application using Maven
+CMD ["./mvnw", "spring-boot:run"]

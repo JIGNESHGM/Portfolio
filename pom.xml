@@ -76,8 +76,9 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
-					<source>23</source>  <!-- Set Java source version to 23 -->
-                	<target>23</target> 
+					<source>17</source>
+					<target>17</target>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>
